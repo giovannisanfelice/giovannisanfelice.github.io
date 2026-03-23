@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<title>Portfolio</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+<style>
+
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    background: #000;      /* sfondo nero */
+    overflow-x: hidden;    /* niente scroll laterale */
+}
+
+#pdf-container {
+    width: 100%;
+    margin: 0;
+    padding: 10px 0;       /* solo spazio verticale tra le pagine */
+    box-sizing: border-box;;
+}
+
+canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin: 0 0 20px 0;      /* margine verticale tra le pagine */
+    border-radius: 8px;       /* angoli leggermente arrotondati */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.6); /* ombra morbida */
+    background: transparent;   /* sfondo trasparente */
+}
+
+@media (max-width:768px){
+
+#pdf-container{
+padding:5px;
+}
+
+canvas{
+margin-bottom:10px;
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="pdf-container"></div>
+
+<script>
+
+const url = "giovannisanfelice.pdf";
+
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+"https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+const container = document.getElementById("pdf-container");
+
+pdfjsLib.getDocument(url).promise.then(pdf => {
+
+for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
+
+pdf.getPage(pageNumber).then(page => {
+
+const scale = window.innerWidth < 768 ? 2.2 : 3;
+
+const viewport = page.getViewport({ scale: scale });
+
+const canvas = document.createElement("canvas");
+
+const context = canvas.getContext("2d");
+
+canvas.height = viewport.height;
+canvas.width = viewport.width;
+
+container.appendChild(canvas);
+
+page.render({
+canvasContext: context,
+viewport: viewport
+});
+
+});
+
+}
+
+});
+
+</script>
+
+</body>
+</html>
