@@ -16,35 +16,43 @@ body, html {
     margin: 0;
     padding: 0;
     width: 100%;
-    background: #000;      /* sfondo nero */
-    overflow-x: hidden;    /* niente scroll laterale */
+    background: #000;
+    overflow-x: hidden;
+
+    display: flex;
+    justify-content: center; /* centra tutto */
 }
 
+/* contenitore centrato */
 #pdf-container {
     width: 100%;
-    margin: 0;
-    padding: 10px 0;       /* solo spazio verticale tra le pagine */
-    box-sizing: border-box;;
+    max-width: 600px;       /* larghezza tipo pagina */
+    margin: 0 auto;
+    padding: 20px 0;
+    box-sizing: border-box;
 }
 
+/* pagine PDF */
 canvas {
     display: block;
     width: 100%;
     height: auto;
-    margin: 0 0 20px 0;      /* margine verticale tra le pagine */
-    border-radius: 8px;       /* angoli leggermente arrotondati */
-    box-shadow: 0 4px 15px rgba(0,0,0,0.6); /* ombra morbida */
-    background: transparent;   /* sfondo trasparente */
+    margin: 0 auto 20px auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+    background: transparent;
 }
 
+/* mobile */
 @media (max-width:768px){
 
 #pdf-container{
-padding:5px;
+    max-width: 95%;
+    padding: 10px;
 }
 
 canvas{
-margin-bottom:10px;
+    margin-bottom: 15px;
 }
 
 }
@@ -68,31 +76,30 @@ const container = document.getElementById("pdf-container");
 
 pdfjsLib.getDocument(url).promise.then(pdf => {
 
-for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
+    for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
 
-pdf.getPage(pageNumber).then(page => {
+        pdf.getPage(pageNumber).then(page => {
 
-const scale = window.innerWidth < 768 ? 2.2 : 3;
+            const scale = window.innerWidth < 768 ? 2.2 : 3;
 
-const viewport = page.getViewport({ scale: scale });
+            const viewport = page.getViewport({ scale: scale });
 
-const canvas = document.createElement("canvas");
+            const canvas = document.createElement("canvas");
+            const context = canvas.getContext("2d");
 
-const context = canvas.getContext("2d");
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
 
-canvas.height = viewport.height;
-canvas.width = viewport.width;
+            container.appendChild(canvas);
 
-container.appendChild(canvas);
+            page.render({
+                canvasContext: context,
+                viewport: viewport
+            });
 
-page.render({
-canvasContext: context,
-viewport: viewport
-});
+        });
 
-});
-
-}
+    }
 
 });
 
